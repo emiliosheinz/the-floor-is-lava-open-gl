@@ -1,5 +1,5 @@
 {
   "scripts": {
-    "start": "g++ -framework Cocoa -framework OpenGL -framework IOKit -o main main.cpp gl_utils.cpp stb_image.cpp maths_funcs.cpp -I include -I/sw/include -I/usr/local/include -I ./common/include ./common/osx_64/libGLEW.a ./common/osx_64/libglfw3.a && ./main"
+    "start:mac": "g++ -framework Cocoa -framework OpenGL -framework IOKit -o main main.cpp gl_utils.cpp stb_image.cpp maths_funcs.cpp -I include -I/sw/include -I/usr/local/include -I ./common/include ./common/osx_64/libGLEW.a ./common/osx_64/libglfw3.a && ./main"
   }
 }
