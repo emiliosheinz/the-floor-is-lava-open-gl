@@ -1,11 +1,3 @@
-//
-//  SlideView.h
-//  ExercSlidemap
-//
-//  Created by Leandro Tonietto on 09/05/16.
-//  Copyright © 2016 Leandro Tonietto. All rights reserved.
-//
-
 #ifndef SlideView_h
 #define SlideView_h
 
@@ -13,7 +5,7 @@
 #include <iostream>
 using namespace std;
 
-class SlideView : public TilemapView
+class DiamondView : public TilemapView
 {
 public:
     void computeDrawPosition(const int col, const int row, const float tw, const float th, float &targetx, float &targety) const
@@ -68,4 +60,4 @@ public:
     }
 };
 
-#endif /* SlideView_h */
+#endif
