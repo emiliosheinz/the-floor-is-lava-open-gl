@@ -14,10 +14,12 @@
 #include <iostream>
 #include <vector>
 #include "TileMap.h"
-// #include "DiamondView.h"
-#include "SlideView.h"
+#include "DiamondView.h"
 #include "ltMath.h"
 #include <fstream>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 /* Command line build:
 	g++ -framework Cocoa -framework OpenGL -framework IOKit -o demoIsom gl_utils.cpp maths_funcs.cpp stb_image.cpp _isometrico.cpp  -I include -I/sw/include -I/usr/local/include -I ../common/include ../common/osx_64/libGLEW.a ../common/osx_64/libglfw3.a
@@ -39,8 +41,7 @@ float tileW, tileW2;
 float tileH, tileH2;
 int cx = -1, cy = -1;
 
-// TilemapView *tview = new DiamondView();
-TilemapView *tview = new SlideView();
+TilemapView *tview = new DiamondView();
 TileMap *tmap = NULL;
 
 GLFWwindow *g_window = NULL;
@@ -113,7 +114,6 @@ void SRD2SRU(double &mx, double &my, float &x, float &y)
 
 void mouse(double &mx, double &my)
 {
-
 	// cout << "DEBUG => mouse click" << endl;
 
 	// 1) Definição do tile candidato ao clique
@@ -331,6 +331,8 @@ int main()
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glm::mat4 proj = glm::ortho(0.0f, (float)g_gl_width, (float)g_gl_height, 0.0f, -1.0f, 1.0f);
+
 	// glEnable(GL_DEPTH_TEST);
 	while (!glfwWindowShouldClose(g_window))
 	{
