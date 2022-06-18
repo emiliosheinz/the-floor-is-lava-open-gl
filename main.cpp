@@ -22,6 +22,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <thread>
 #include "src/LavaLogics.h"
+#include "src/Walking.h"
 
 /* Command line build:
 	g++ -framework Cocoa -framework OpenGL -framework IOKit -o demoIsom gl_utils.cpp maths_funcs.cpp stb_image.cpp _isometrico.cpp  -I include -I/sw/include -I/usr/local/include -I ../common/include ../common/osx_64/libGLEW.a ../common/osx_64/libglfw3.a
@@ -391,12 +392,9 @@ int main()
 		{
 			glfwSetWindowShouldClose(g_window, 1);
 		}
-		if (GLFW_PRESS == glfwGetKey(g_window, GLFW_KEY_UP))
-		{
-		}
-		if (GLFW_PRESS == glfwGetKey(g_window, GLFW_KEY_DOWN))
-		{
-		}
+
+		mapWalingEvents();
+
 		double mx, my;
 		glfwGetCursorPos(g_window, &mx, &my);
 
