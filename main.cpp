@@ -36,7 +36,7 @@ float yf = 1.0f;
 float w = xf - xi;
 float h = yf - yi;
 float tw, th, tw2, th2;
-int tileSetCols = 9, tileSetRows = 9;
+int tileSetCols = 2, tileSetRows = 1;
 float tileW, tileW2;
 float tileH, tileH2;
 int cx = -1, cy = -1;
