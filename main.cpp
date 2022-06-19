@@ -22,6 +22,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <thread>
 #include "src/LavaLogics.h"
+#include "src/GameUtils.h"
 
 /* Command line build:
 	g++ -framework Cocoa -framework OpenGL -framework IOKit -o demoIsom gl_utils.cpp maths_funcs.cpp stb_image.cpp _isometrico.cpp  -I include -I/sw/include -I/usr/local/include -I ../common/include ../common/osx_64/libGLEW.a ../common/osx_64/libglfw3.a
@@ -60,10 +61,8 @@ TileMap *readMap(char *filename)
 		{
 			int tid;
 			arq >> tid;
-			cout << tid << " ";
 			tmap->setTile(c, h - r - 1, tid);
 		}
-		cout << endl;
 	}
 	arq.close();
 	return tmap;
@@ -91,12 +90,10 @@ int loadTexture(unsigned int &texture, char *filename)
 	{
 		if (nrChannels == 4)
 		{
-			cout << "Alpha channel" << endl;
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 		}
 		else
 		{
-			cout << "Without Alpha channel" << endl;
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
 		}
 		glGenerateMipmap(GL_TEXTURE_2D);
@@ -195,11 +192,9 @@ void mouse(double &mx, double &my)
 
 	if ((c < 0) || (c >= tmap->getWidth()) || (r < 0) || (r >= tmap->getHeight()))
 	{
-		cout << "wrong click position: " << c << ", " << r << endl;
 		return; // posição inválida!
 	}
 
-	cout << "SELECIONADO c=" << c << "," << r << endl;
 	playerX = c;
 	playerY = r;
 }
@@ -226,6 +221,7 @@ void onKeyPress(GLFWwindow *window, int key, int scancode, int action, int mods)
 
 int main()
 {
+	startGame();
 	restart_gl_log();
 	// all the GLFW and GLEW start-up code is moved to here in gl_utils.cpp
 	start_gl();
@@ -233,7 +229,6 @@ int main()
 	glEnable(GL_DEPTH_TEST); // enable depth-testing
 	glDepthFunc(GL_LESS);
 
-	cout << "Tentando criar tmap" << endl;
 	tmap = readMap("terrain1.tmap");
 	tw = w / (float)tmap->getWidth();
 	th = tw / 2.0f;
@@ -244,16 +239,10 @@ int main()
 	tileH = 1.0f / (float)tileSetRows;
 	tileH2 = tileH / 2.0f;
 
-	cout << "tw=" << tw << " th=" << th << " tw2=" << tw2 << " th2=" << th2
-			 << " tileW=" << tileW << " tileH=" << tileH
-			 << " tileW2=" << tileW2 << " tileH2=" << tileH2
-			 << endl;
-
 	GLuint tid;
 	loadTexture(tid, "terrain.png");
 
 	tmap->setTid(tid);
-	cout << "Tmap inicializado" << endl;
 
 	// LOAD TEXTURES
 
@@ -346,9 +335,7 @@ int main()
 		for (int c = 0; c < tmap->getWidth(); c++)
 		{
 			unsigned char t_id = tmap->getTile(c, r);
-			cout << ((int)t_id) << " ";
 		}
-		cout << endl;
 	}
 
 	glEnable(GL_BLEND);
@@ -366,6 +353,13 @@ int main()
 	// glEnable(GL_DEPTH_TEST);
 	while (!glfwWindowShouldClose(g_window))
 	{
+		if (getGameStatus(tmap, playerX, playerY) == FINISHED)
+		{
+			cout << "\nJogo finalizado.\nVocê sobreviveu por " << getElapsedTimeInSeconds() << " segundos!\n"
+					 << endl;
+			glfwSetWindowShouldClose(g_window, 1);
+		}
+
 		_update_fps_counter(g_window);
 		double current_seconds = glfwGetTime();
 
