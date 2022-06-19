@@ -115,11 +115,19 @@ void startSpreadingLava(TileMap *tmap)
   Coord c3 = getRandomCoord(tmap);
   tmap->setTile(c3.x, c3.y, 1);
 
+  Coord c4 = getRandomCoord(tmap);
+  tmap->setTile(c4.x, c4.y, 1);
+
+  Coord c5 = getRandomCoord(tmap);
+  tmap->setTile(c5.x, c5.y, 1);
+
   vector<Coord> coords;
 
   coords.push_back(c1);
   coords.push_back(c2);
   coords.push_back(c3);
+  coords.push_back(c4);
+  coords.push_back(c5);
 
   spreadLava(&coords, tmap);
 }
