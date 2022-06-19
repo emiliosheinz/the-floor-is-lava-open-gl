@@ -106,16 +106,16 @@ void spreadLava(vector<Coord> *coordsParam, TileMap *tmap)
  **/
 void startSpreadingLava(TileMap *tmap)
 {
-  Coord c1 = getRandomCoord(tmap);
+  Coord c1 = {0, 0};
   tmap->setTile(c1.x, c1.y, 1);
 
-  Coord c2 = getRandomCoord(tmap);
+  Coord c2 = {0, tmap->getHeight() - 1};
   tmap->setTile(c2.x, c2.y, 1);
 
-  Coord c3 = getRandomCoord(tmap);
+  Coord c3 = {tmap->getWidth() - 1, 0};
   tmap->setTile(c3.x, c3.y, 1);
 
-  Coord c4 = getRandomCoord(tmap);
+  Coord c4 = {tmap->getWidth() - 1, tmap->getHeight() - 1};
   tmap->setTile(c4.x, c4.y, 1);
 
   Coord c5 = getRandomCoord(tmap);
