@@ -20,6 +20,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <thread>
+#include "src/LavaLogics.h"
 
 /* Command line build:
 	g++ -framework Cocoa -framework OpenGL -framework IOKit -o demoIsom gl_utils.cpp maths_funcs.cpp stb_image.cpp _isometrico.cpp  -I include -I/sw/include -I/usr/local/include -I ../common/include ../common/osx_64/libGLEW.a ../common/osx_64/libglfw3.a
@@ -332,6 +334,14 @@ int main()
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glm::mat4 proj = glm::ortho(0.0f, (float)g_gl_width, (float)g_gl_height, 0.0f, -1.0f, 1.0f);
+
+	/*
+	 * Start a new thread to spread the lava while the
+	 * main thread is rendering the terrain.
+	 **/
+	std::thread([=]()
+							{ startSpreadingLava(tmap); })
+			.detach();
 
 	// glEnable(GL_DEPTH_TEST);
 	while (!glfwWindowShouldClose(g_window))
