@@ -22,6 +22,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <thread>
 #include "src/LavaLogics.h"
+#include "src/GameUtils.h"
 
 /* Command line build:
 	g++ -framework Cocoa -framework OpenGL -framework IOKit -o demoIsom gl_utils.cpp maths_funcs.cpp stb_image.cpp _isometrico.cpp  -I include -I/sw/include -I/usr/local/include -I ../common/include ../common/osx_64/libGLEW.a ../common/osx_64/libglfw3.a
@@ -41,7 +42,7 @@ float tw, th, tw2, th2;
 int tileSetCols = 2, tileSetRows = 1;
 float tileW, tileW2;
 float tileH, tileH2;
-int cx = -1, cy = -1;
+int playerX = 15, playerY = 15;
 
 TilemapView *tview = new DiamondView();
 TileMap *tmap = NULL;
@@ -60,10 +61,8 @@ TileMap *readMap(char *filename)
 		{
 			int tid;
 			arq >> tid;
-			cout << tid << " ";
 			tmap->setTile(c, h - r - 1, tid);
 		}
-		cout << endl;
 	}
 	arq.close();
 	return tmap;
@@ -91,12 +90,10 @@ int loadTexture(unsigned int &texture, char *filename)
 	{
 		if (nrChannels == 4)
 		{
-			cout << "Alpha channel" << endl;
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 		}
 		else
 		{
-			cout << "Without Alpha channel" << endl;
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
 		}
 		glGenerateMipmap(GL_TEXTURE_2D);
@@ -182,30 +179,49 @@ void mouse(double &mx, double &my)
 	if (!collide)
 	{
 		// 2.4) Em caso "erro" de cálculo, deve ser feito o tileWalking para tile certo!
-		cout << "tileWalking " << endl;
-		if (left)
-		{
-			tview->computeTileWalking(c, r, DIRECTION_WEST);
-		}
-		else
-		{
-			tview->computeTileWalking(c, r, DIRECTION_EAST);
-		}
+		// cout << "tileWalking " << endl;
+		// if (left)
+		// {
+		// 	tview->computeTileWalking(c, r, DIRECTION_WEST);
+		// }
+		// else
+		// {
+		// 	tview->computeTileWalking(c, r, DIRECTION_EAST);
+		// }
 	}
 
 	if ((c < 0) || (c >= tmap->getWidth()) || (r < 0) || (r >= tmap->getHeight()))
 	{
-		cout << "wrong click position: " << c << ", " << r << endl;
 		return; // posição inválida!
 	}
 
-	cout << "SELECIONADO c=" << c << "," << r << endl;
-	cx = c;
-	cy = r;
+	playerX = c;
+	playerY = r;
+}
+
+void onKeyPress(GLFWwindow *window, int key, int scancode, int action, int mods)
+{
+	if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS)
+	{
+		tview->computeTileWalking(playerX, playerY, DIRECTION_EAST);
+	}
+	else if (key == GLFW_KEY_LEFT && action == GLFW_PRESS)
+	{
+		tview->computeTileWalking(playerX, playerY, DIRECTION_WEST);
+	}
+	else if (key == GLFW_KEY_UP && action == GLFW_PRESS)
+	{
+		tview->computeTileWalking(playerX, playerY, DIRECTION_NORTH);
+	}
+	else if (key == GLFW_KEY_DOWN && action == GLFW_PRESS)
+	{
+		tview->computeTileWalking(playerX, playerY, DIRECTION_SOUTH);
+	}
 }
 
 int main()
 {
+	startGame();
 	restart_gl_log();
 	// all the GLFW and GLEW start-up code is moved to here in gl_utils.cpp
 	start_gl();
@@ -213,7 +229,6 @@ int main()
 	glEnable(GL_DEPTH_TEST); // enable depth-testing
 	glDepthFunc(GL_LESS);
 
-	cout << "Tentando criar tmap" << endl;
 	tmap = readMap("terrain1.tmap");
 	tw = w / (float)tmap->getWidth();
 	th = tw / 2.0f;
@@ -224,16 +239,10 @@ int main()
 	tileH = 1.0f / (float)tileSetRows;
 	tileH2 = tileH / 2.0f;
 
-	cout << "tw=" << tw << " th=" << th << " tw2=" << tw2 << " th2=" << th2
-			 << " tileW=" << tileW << " tileH=" << tileH
-			 << " tileW2=" << tileW2 << " tileH2=" << tileH2
-			 << endl;
-
 	GLuint tid;
 	loadTexture(tid, "terrain.png");
 
 	tmap->setTid(tid);
-	cout << "Tmap inicializado" << endl;
 
 	// LOAD TEXTURES
 
@@ -326,9 +335,7 @@ int main()
 		for (int c = 0; c < tmap->getWidth(); c++)
 		{
 			unsigned char t_id = tmap->getTile(c, r);
-			cout << ((int)t_id) << " ";
 		}
-		cout << endl;
 	}
 
 	glEnable(GL_BLEND);
@@ -346,6 +353,13 @@ int main()
 	// glEnable(GL_DEPTH_TEST);
 	while (!glfwWindowShouldClose(g_window))
 	{
+		if (getGameStatus(tmap, playerX, playerY) == FINISHED)
+		{
+			cout << "\nJogo finalizado.\nVocê sobreviveu por " << getElapsedTimeInSeconds() << " segundos!\n"
+					 << endl;
+			glfwSetWindowShouldClose(g_window, 1);
+		}
+
 		_update_fps_counter(g_window);
 		double current_seconds = glfwGetTime();
 
@@ -376,7 +390,7 @@ int main()
 				glUniform1f(glGetUniformLocation(shader_programme, "tx"), x);
 				glUniform1f(glGetUniformLocation(shader_programme, "ty"), y + 1.0);
 				glUniform1f(glGetUniformLocation(shader_programme, "layer_z"), tmap->getZ());
-				glUniform1f(glGetUniformLocation(shader_programme, "weight"), (c == cx) && (r == cy) ? 0.5 : 0.0);
+				glUniform1f(glGetUniformLocation(shader_programme, "weight"), (c == playerX) && (r == playerY) ? 0.5 : 0.0);
 
 				// bind Texture
 				// glActiveTexture(GL_TEXTURE0);
@@ -391,21 +405,13 @@ int main()
 		{
 			glfwSetWindowShouldClose(g_window, 1);
 		}
-		if (GLFW_PRESS == glfwGetKey(g_window, GLFW_KEY_UP))
-		{
-		}
-		if (GLFW_PRESS == glfwGetKey(g_window, GLFW_KEY_DOWN))
-		{
-		}
+
+		glfwSetKeyCallback(g_window, onKeyPress);
+
 		double mx, my;
 		glfwGetCursorPos(g_window, &mx, &my);
 
 		const int state = glfwGetMouseButton(g_window, GLFW_MOUSE_BUTTON_LEFT);
-
-		if (state == GLFW_PRESS)
-		{
-			mouse(mx, my);
-		}
 
 		// put the stuff we've been drawing onto the display
 		glfwSwapBuffers(g_window);
