@@ -1,6 +1,6 @@
 #include <iostream>
 
-std::__1::chrono::steady_clock::time_point start;
+std::chrono::steady_clock::time_point start;
 int RUNNING = 0;
 int FINISHED = 1;
 
