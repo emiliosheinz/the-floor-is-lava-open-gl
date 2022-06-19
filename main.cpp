@@ -12,10 +12,8 @@
 #include <time.h>
 #define GL_LOG_FILE "gl.log"
 #include <iostream>
-#include <vector>
 #include "TileMap.h"
 #include "DiamondView.h"
-#include "ltMath.h"
 #include <fstream>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -23,10 +21,6 @@
 #include <thread>
 #include "src/LavaLogics.h"
 #include "src/GameUtils.h"
-
-/* Command line build:
-	g++ -framework Cocoa -framework OpenGL -framework IOKit -o demoIsom gl_utils.cpp maths_funcs.cpp stb_image.cpp _isometrico.cpp  -I include -I/sw/include -I/usr/local/include -I ../common/include ../common/osx_64/libGLEW.a ../common/osx_64/libglfw3.a
- */
 
 using namespace std;
 
@@ -100,103 +94,9 @@ int loadTexture(unsigned int &texture, char *filename)
 	}
 	else
 	{
-		std::cout << "Failed to load texture" << std::endl;
+		cout << "Failed to load texture" << endl;
 	}
 	stbi_image_free(data);
-}
-
-void SRD2SRU(double &mx, double &my, float &x, float &y)
-{
-	x = xi + (mx / g_gl_width) * w;
-	y = yi + (1 - (my / g_gl_height)) * h;
-}
-
-void mouse(double &mx, double &my)
-{
-	// cout << "DEBUG => mouse click" << endl;
-
-	// 1) Definição do tile candidato ao clique
-	float y = 0;
-	float x = 0;
-	SRD2SRU(mx, my, x, y);
-
-	int c, r;
-	tview->computeMouseMap(c, r, tw, th, x, y);
-	c += (tmap->getWidth() - 1) / 2;
-	r += (tmap->getHeight() - 1) / 2;
-	// cout << "\tDEBUG => r: " << r << " c: " << c << endl;
-
-	// 2) Verificar se o ponto pertence ao tile indicado:
-
-	// 2.1) Normalização do clique:
-	float x0, y0;
-	tview->computeDrawPosition(c, r, tw, th, x0, y0);
-	x0 += xi;
-
-	// cout << "\tDEBUG => mx: " << x  << " my: " << y  << endl;
-	// cout << "\tDEBUG => x0: " << x0 << " y0: " << y0 << endl;
-	// cout << "\tDEBUG => tw: " << tw << endl;
-
-	float point[] = {x, y};
-
-	// 2.2) Verifica se o ponto está dentro do triângulo da esquerda ou da direita do losangulo (metades)
-	//      Implementação via cálculo de área dos triangulos: area(ABC) == area(ABp)+area(ACp)+area(BCp)
-	// triangulo ABC:
-	float *abc = new float[6];
-
-	// 2.2.1) Define metade da esquerda ou da direita
-	bool left = x < (x0 + tw / 2.0f);
-	// cout << "\tDEBUG => mx: " << x << " midx: " << (x0 + tw/2.0f) << endl;
-
-	if (left)
-	{ // left
-		abc[0] = x0;
-		abc[1] = y0 + th / 2.0f;
-		abc[2] = x0 + tw / 2.0f;
-		abc[3] = y0 + th;
-		abc[4] = x0 + tw / 2.0f;
-		abc[5] = y0;
-		// cout << "DEBUG => TRG LFT [(x,y),...] = ([" << abc[0] << "," << abc[1] << "], "
-		// << "[" << abc[2] << "," << abc[3] << "], "
-		// << "[" << abc[4] << "," << abc[5] << "])" << endl;
-	}
-	else
-	{ // right
-		abc[0] = x0 + tw / 2.0f;
-		abc[1] = y0;
-		abc[2] = x0 + tw / 2.0f;
-		abc[3] = y0 + th;
-		abc[4] = x0 + tw;
-		abc[5] = y0 + th / 2.0f;
-		// cout << "DEBUG => TRG RGHT [(x,y),...] = ([" << abc[0] << "," << abc[1] << "], "
-		// << "[" << abc[2] << "," << abc[3] << "], "
-		// << "[" << abc[4] << "," << abc[5] << "])" << endl;
-	}
-
-	// 2.3) Calcular colisão do ponto com o triangulo
-	bool collide = triangleCollidePoint2D(abc, point);
-
-	if (!collide)
-	{
-		// 2.4) Em caso "erro" de cálculo, deve ser feito o tileWalking para tile certo!
-		// cout << "tileWalking " << endl;
-		// if (left)
-		// {
-		// 	tview->computeTileWalking(c, r, DIRECTION_WEST);
-		// }
-		// else
-		// {
-		// 	tview->computeTileWalking(c, r, DIRECTION_EAST);
-		// }
-	}
-
-	if ((c < 0) || (c >= tmap->getWidth()) || (r < 0) || (r >= tmap->getHeight()))
-	{
-		return; // posição inválida!
-	}
-
-	playerX = c;
-	playerY = r;
 }
 
 void onKeyPress(GLFWwindow *window, int key, int scancode, int action, int mods)
@@ -346,7 +246,7 @@ int main()
 	 * Start a new thread to spread the lava while the
 	 * main thread is rendering the terrain.
 	 **/
-	std::thread([=]()
+	thread([=]()
 							{ startSpreadingLava(tmap); })
 			.detach();
 
@@ -407,12 +307,6 @@ int main()
 		}
 
 		glfwSetKeyCallback(g_window, onKeyPress);
-
-		double mx, my;
-		glfwGetCursorPos(g_window, &mx, &my);
-
-		const int state = glfwGetMouseButton(g_window, GLFW_MOUSE_BUTTON_LEFT);
-
 		// put the stuff we've been drawing onto the display
 		glfwSwapBuffers(g_window);
 	}
