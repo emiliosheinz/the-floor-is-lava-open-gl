@@ -29,32 +29,20 @@ public:
         switch (direction)
         {
         case DIRECTION_NORTH:
-            col--;
-            row += 2;
+            row--;
+            col++;
             break;
         case DIRECTION_EAST:
             col++;
+            row++;
             break;
         case DIRECTION_SOUTH:
-            col++;
-            row -= 2;
+            row++;
+            col--;
             break;
         case DIRECTION_WEST:
             col--;
-            break;
-        case DIRECTION_NORTHEAST:
-            row++;
-            break;
-        case DIRECTION_SOUTHEAST:
-            col++;
             row--;
-            break;
-        case DIRECTION_SOUTHWEST:
-            row--;
-            break;
-        case DIRECTION_NORTHWEST:
-            col--;
-            row++;
             break;
         }
     }
