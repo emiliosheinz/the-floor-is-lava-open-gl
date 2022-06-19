@@ -121,6 +121,7 @@ void onKeyPress(GLFWwindow *window, int key, int scancode, int action, int mods)
 
 int main()
 {
+  	srand((unsigned)time( NULL ));
 	startGame();
 	restart_gl_log();
 	// all the GLFW and GLEW start-up code is moved to here in gl_utils.cpp
