@@ -14,16 +14,6 @@ public:
         targety = col * th / 2 - row * th / 2;
     }
 
-    void computeMouseMap(int &col, int &row, const float tw, const float th, const float mx, const float my) const
-    {
-        float tw2 = tw / 2.0f;
-        float th2 = th / 2.0f;
-
-        row = my / th2;
-        col = (mx - row * tw2) / tw;
-        // cout << "dest: " << col << "," << row << endl;
-    }
-
     void computeTileWalking(int &col, int &row, const int direction) const
     {
         switch (direction)
