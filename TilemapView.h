@@ -22,7 +22,6 @@ class TilemapView
 {
 public:
     virtual void computeDrawPosition(const int col, const int row, const float tw, const float th, float &targetx, float &targety) const = 0;
-    virtual void computeMouseMap(int &col, int &row, const float tw, const float th, const float mx, const float my) const = 0;
     virtual void computeTileWalking(int &col, int &row, const int direction) const = 0;
 };
 
