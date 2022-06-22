@@ -241,8 +241,6 @@ int main()
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glm::mat4 proj = glm::ortho(0.0f, (float)g_gl_width, (float)g_gl_height, 0.0f, -1.0f, 1.0f);
-
 	/*
 	 * Start a new thread to spread the lava while the
 	 * main thread is rendering the terrain.
